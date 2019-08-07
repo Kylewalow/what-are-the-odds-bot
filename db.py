@@ -26,10 +26,10 @@ class db:
         tablename = self.chatId
         tablename = 'chat' + str(tablename*-1)
         query = "CREATE TABLE "+ tablename +""" ( 
-            challanger text,
-            numberChallanger integer, 
-            challanged text, 
-            numberChallanged integer
+            challenger text,
+            numberChallenger integer, 
+            challenged text, 
+            numberChallenged integer
             )"""
         c.execute(query)
         conn.commit()
@@ -41,114 +41,114 @@ class db:
         tablename = self.chatId
         tablename = """'""" + 'chat' + str(tablename*-1) + """'"""
  
-        #Get Challanger name (name will only by in DB if a Game is still running)
-        query = "SELECT challanger FROM " + tablename
+        #Get Challenger name (name will only by in DB if a Game is still running)
+        query = "SELECT challenger FROM " + tablename
         c.execute(query)
-        stillingameChallanger = c.fetchone()
+        stillingameChallenger = c.fetchone()
  
-        #Get Challanged name (name will only by in DB if a game is still running)
-        query = "SELECT challanged FROM " + tablename
+        #Get Challenged name (name will only by in DB if a game is still running)
+        query = "SELECT challenged FROM " + tablename
         c.execute(query)
-        stillingameChallanged = c.fetchone()
+        stillingameChallenged = c.fetchone()
         conn.close()
  
-        return(stillingameChallanger, stillingameChallanged)
+        return(stillingameChallenger, stillingameChallenged)
  
-    def storeNameChallanger(self, nameChallanger):
+    def storeNameChallenger(self, nameChallenger):
         conn = sqlite3.connect('1to30.db')
         c = conn.cursor()
         tablename = self.chatId
         tablename = """'""" + 'chat' + str(tablename*-1) + """'"""
-        nameChallanger = """'"""+ nameChallanger +"""'"""
+        nameChallenger = """'"""+ nameChallenger +"""'"""
  
-        query = "INSERT INTO "+ tablename +"(challanger) VALUES ("+ nameChallanger +")"
+        query = "INSERT INTO "+ tablename +"(challenger) VALUES ("+ nameChallenger +")"
         c.execute(query)
         conn.commit()
         conn.close()
  
-    def storeNameChallanged(self, nameChallanged):
+    def storeNameChallenged(self, nameChallenged):
         conn = sqlite3.connect('1to30.db')
         c = conn.cursor()
         tablename = self.chatId
         tablename = """'""" + 'chat' + str(tablename*-1) + """'"""
-        nameChallanged = """'"""+ nameChallanged +"""'"""
+        nameChallenged = """'"""+ nameChallenged +"""'"""
  
-        query = "UPDATE "+ tablename +" SET challanged = "+ nameChallanged
+        query = "UPDATE "+ tablename +" SET challenged = "+ nameChallenged
         c.execute(query)
         conn.commit()
         conn.close()
  
-    def getChallangerName(self):
+    def getChallengerName(self):
         conn = sqlite3.connect('1to30.db')
         c = conn.cursor()
         tablename = self.chatId
         tablename = """'""" + 'chat' + str(tablename*-1) + """'"""
  
-        query = "SELECT challanger FROM " + tablename
+        query = "SELECT challenger FROM " + tablename
         c.execute(query)
-        challanger = c.fetchone()
+        challenger = c.fetchone()
         conn.close()
-        return(challanger)
+        return(challenger)
  
-    def getChallangedName(self):
+    def getChallengedName(self):
         conn = sqlite3.connect('1to30.db')
         c = conn.cursor()
         tablename = self.chatId
         tablename = """'""" + 'chat' + str(tablename*-1) + """'"""
  
-        query = "SELECT challanged FROM " + tablename
+        query = "SELECT challenged FROM " + tablename
         c.execute(query)
-        challanged = c.fetchone()
+        challenged = c.fetchone()
         conn.close()
-        return(challanged)
+        return(challenged)
  
-    def storeNumberChallanger(self, numberChallanger):
+    def storeNumberChallenger(self, numberChallenger):
         conn = sqlite3.connect('1to30.db')
         c = conn.cursor()
         tablename = self.chatId
         tablename = """'""" + 'chat' + str(tablename*-1) + """'"""
-        numberChallanger = """'"""+ str(numberChallanger) +"""'"""
+        numberChallenger = """'"""+ str(numberChallenger) +"""'"""
  
-        query = "UPDATE "+ tablename +" SET numberChallanger = "+ numberChallanger
-        c.execute(query)
-        conn.commit()
-        conn.close()
- 
-    def storeNumberChallanged(self, numberChallanged):
-        conn = sqlite3.connect('1to30.db')
-        c = conn.cursor()
-        tablename = self.chatId
-        tablename = """'""" + 'chat' + str(tablename*-1) + """'"""
-        numberChallanged = """'"""+ str(numberChallanged) +"""'"""
- 
-        query = "UPDATE "+ tablename +" SET numberChallanged = "+ numberChallanged
+        query = "UPDATE "+ tablename +" SET numberChallenger = "+ numberChallenger
         c.execute(query)
         conn.commit()
         conn.close()
  
-    def getChallangerNumber(self):
+    def storeNumberChallenged(self, numberChallenged):
+        conn = sqlite3.connect('1to30.db')
+        c = conn.cursor()
+        tablename = self.chatId
+        tablename = """'""" + 'chat' + str(tablename*-1) + """'"""
+        numberChallenged = """'"""+ str(numberChallenged) +"""'"""
+ 
+        query = "UPDATE "+ tablename +" SET numberChallenged = "+ numberChallenged
+        c.execute(query)
+        conn.commit()
+        conn.close()
+ 
+    def getChallengerNumber(self):
         conn = sqlite3.connect('1to30.db')
         c = conn.cursor()
         tablename = self.chatId
         tablename = """'""" + 'chat' + str(tablename*-1) + """'"""
  
-        query = "SELECT numberChallanger FROM " + tablename
+        query = "SELECT numberChallenger FROM " + tablename
         c.execute(query)
-        numberChallanger = c.fetchone()
+        numberChallenger = c.fetchone()
         conn.close()
-        return(numberChallanger)
+        return(numberChallenger)
  
-    def getChallangedNumber(self):
+    def getChallengedNumber(self):
         conn = sqlite3.connect('1to30.db')
         c = conn.cursor()
         tablename = self.chatId
         tablename = """'""" + 'chat' + str(tablename*-1) + """'"""
  
-        query = "SELECT numberChallanged FROM " + tablename
+        query = "SELECT numberChallenged FROM " + tablename
         c.execute(query)
-        numberChallanged = c.fetchone()
+        numberChallenged = c.fetchone()
         conn.close()
-        return(numberChallanged)
+        return(numberChallenged)
  
     def cancleGame(self):
         conn = sqlite3.connect('1to30.db')
