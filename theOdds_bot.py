@@ -8,7 +8,7 @@ import telebot                                  # pip3 install telebot
 from telebot import types                       # works only with python3.4 and lower
 import logging
 
-logging.basicConfig(filename='theOdds_bot.log', filemode='w', format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S', level=logging.DEBUG)
+logging.basicConfig(filename='theOdds_bot.log', filemode='w', format='%(asctime)s - %(message)s', datefmt='%d-%b-%y %H:%M:%S', level=logging.CRITICAL)
 
 bot_token = config.token
 bot = telebot.TeleBot(token=bot_token)
@@ -39,7 +39,7 @@ def helpMessage(message):
     chatId = message.chat.id
     nameChallenger = message.from_user.first_name
     dbTable = db(chatId)
-    logging.info(str(chatId) +' '+ nameChallenger +' starting a game')
+    logging.critical(str(chatId) +' '+ nameChallenger +' starting a game')
 
     #Create table named chatId if not already exist
     if dbTable.checkTableExist() == False:
@@ -110,13 +110,15 @@ def defineRange(query):
     chatId = query.message.chat.id
     dbTable = db(chatId)
     messageId = query.message.message_id
-    challenger = dbTable.getChallengerName()
+    challenger = dbTable.getFromDb('challenger')
     whoPressedTheButton = query.from_user.first_name
  
     if whoPressedTheButton == challenger: #[0]!!!!!!!!!!!!!!!
-        bot.send_message(chatId, whoPressedTheButton +''', you can't play with yourself 😒''')
+        sentMessage = bot.send_message(chatId, whoPressedTheButton +''', you can't play with yourself 😒''')
+        time.sleep(4)
+        bot.delete_message(chat_id=chatId, message_id=sentMessage.message_id)
     else:
-        logging.info(str(chatId) +' '+ whoPressedTheButton +' accept the challenge from '+ challenger[0])
+        logging.critical(str(chatId) +' '+ whoPressedTheButton +' accept the challenge from '+ challenger[0])
         dbTable.storeNameChallenged(whoPressedTheButton)
 
 #Generate dynamic numbers of buttons for phase two (choose number) 
@@ -135,27 +137,35 @@ def chooseNumber(query):
     whoPressedTheButton = query.from_user.first_name
     messageId = query.message.message_id
  
-    nameChallenger = dbTable.getChallengerName()
-    nameChallenged = dbTable.getChallengedName()
-    numberChallenger = dbTable.getChallengerNumber()
-    numberChallenged = dbTable.getChallengedNumber()
+    nameChallenger = dbTable.getFromDb('challenger')
+    nameChallenged = dbTable.getFromDb('challenged')
+    numberChallenger = dbTable.getFromDb('numberChallenger')
+    numberChallenged = dbTable.getFromDb('numberChallenged')
+
+    print(nameChallenger[0], numberChallenger[0])
+    print(nameChallenged[0], numberChallenged[0])
  
     if whoPressedTheButton == nameChallenger[0] and numberChallenger[0] == None:
         dbTable.storeNumberChallenger(int(query.data) -100)
-        challengerChoosed = bot.send_message(chatId, whoPressedTheButton +' did choose')
+        sentMessage = bot.send_message(chatId, whoPressedTheButton +' did choose')
+        dbTable.storeChosenChallenger(sentMessage.message_id)
     time.sleep(1.5)
 
     if whoPressedTheButton == nameChallenged[0] and numberChallenged[0] == None:
         dbTable.storeNumberChallenged(int(query.data) -100)
-        challengedChoosed = bot.send_message(chatId, whoPressedTheButton +' did choose')
+        sentMessage = bot.send_message(chatId, whoPressedTheButton +' did choose')
+        dbTable.storeChosenChallengerd(sentMessage.message_id)
     time.sleep(1.5)
     
-    numberChallenger = dbTable.getChallengerNumber()
-    numberChallenged = dbTable.getChallengedNumber()
+    numberChallenger = dbTable.getFromDb('numberChallenger')
+    numberChallenged = dbTable.getFromDb('numberChallenged')
     if numberChallenger[0] != None and numberChallenged[0] != None:
-        
-        bot.delete_message(chat_id=chatId, message_id=challengerChoosed.message_id)
-        bot.delete_message(chat_id=chatId, message_id=challengedChoosed.message_id)
+
+        #Delete 'chosen' Message
+        chosenMessageId1 = dbTable.getFromDb('chosenChallenger')
+        chosenMessageId2 = dbTable.getFromDb('chosenChallenged')
+        bot.delete_message(chat_id=chatId, message_id= chosenMessageId1[0])
+        bot.delete_message(chat_id=chatId, message_id= chosenMessageId2[0])
 
         bot.edit_message_text(chat_id=chatId, message_id=messageId, text = 'The numbers are chosen! Lets come to the final and compare them in:')
         time.sleep(2.5)
@@ -183,7 +193,7 @@ def chooseNumber(query):
         bot.delete_message(chat_id=chatId, message_id=messageId)                                    
         bot.edit_message_text(chat_id=chatId, message_id=sentMessage.message_id, text = '🧐', reply_markup=winKeyboard)
 
-        logging.info(str(chatId) +' '+ nameChallenger[0] +' '+ nameChallenged[0] + ' finished the game') 
+        logging.critical(str(chatId) +' '+ nameChallenger[0] +' '+ nameChallenged[0] + ' finished the game') 
         dbTable.dropTable()
 
 
@@ -194,8 +204,8 @@ def deleteFinalMessages(query):
     messageId = query.message.message_id
     bot.delete_message(chat_id=chatId, message_id=messageId)
                
-#while True:
- #   try:
-bot.polling(interval=1)
-   # except Exception:
-    #    time.sleep(15)
+while True:
+    try:
+        bot.polling(interval=1)
+    except Exception:
+        time.sleep(15)
