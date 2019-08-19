@@ -116,7 +116,7 @@ class db:
         conn.commit()
         conn.close()
 
-    def storeChosenChallengerd(self, chosenChallenged):
+    def storeChosenChallenged(self, chosenChallenged):
         conn = sqlite3.connect('1to30.db')
         c = conn.cursor()
         tablename = self.chatId

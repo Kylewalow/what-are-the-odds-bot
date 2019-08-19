@@ -1,10 +1,10 @@
 import config
 from db import db
-import time
+import time                           
 from telegram import InlineKeyboardButton       # pip3 install python-telegram-bot
 from telegram import InlineKeyboardMarkup       # pip3 install telegram
 from telegram import CallbackQuery               
-import telebot                                  # pip3 install telebot
+import telebot                                  # pip3 install pytelegrambotapi
 from telebot import types                       # works only with python3.4 and lower
 import logging
 
@@ -47,7 +47,6 @@ def helpMessage(message):
          
     #Check if a Game ist still running. (If names are in db the game is still running)
     pendentGame = dbTable.checkPendentGame()
-    print(pendentGame)
     
     #If a game is still running the user can choose between cancle the game and begin a new one or wait until it's done
     if pendentGame[0] != None or pendentGame[1] != None:
@@ -113,7 +112,7 @@ def defineRange(query):
     challenger = dbTable.getFromDb('challenger')
     whoPressedTheButton = query.from_user.first_name
  
-    if whoPressedTheButton == challenger: #[0]!!!!!!!!!!!!!!!
+    if whoPressedTheButton == challenger[0]: #[0]!!!!!!!!!!!!!!!
         sentMessage = bot.send_message(chatId, whoPressedTheButton +''', you can't play with yourself 😒''')
         time.sleep(4)
         bot.delete_message(chat_id=chatId, message_id=sentMessage.message_id)
@@ -141,9 +140,6 @@ def chooseNumber(query):
     nameChallenged = dbTable.getFromDb('challenged')
     numberChallenger = dbTable.getFromDb('numberChallenger')
     numberChallenged = dbTable.getFromDb('numberChallenged')
-
-    print(nameChallenger[0], numberChallenger[0])
-    print(nameChallenged[0], numberChallenged[0])
  
     if whoPressedTheButton == nameChallenger[0] and numberChallenger[0] == None:
         dbTable.storeNumberChallenger(int(query.data) -100)
@@ -154,7 +150,7 @@ def chooseNumber(query):
     if whoPressedTheButton == nameChallenged[0] and numberChallenged[0] == None:
         dbTable.storeNumberChallenged(int(query.data) -100)
         sentMessage = bot.send_message(chatId, whoPressedTheButton +' did choose')
-        dbTable.storeChosenChallengerd(sentMessage.message_id)
+        dbTable.storeChosenChallenged(sentMessage.message_id)
     time.sleep(1.5)
     
     numberChallenger = dbTable.getFromDb('numberChallenger')
@@ -164,8 +160,12 @@ def chooseNumber(query):
         #Delete 'chosen' Message
         chosenMessageId1 = dbTable.getFromDb('chosenChallenger')
         chosenMessageId2 = dbTable.getFromDb('chosenChallenged')
-        bot.delete_message(chat_id=chatId, message_id= chosenMessageId1[0])
-        bot.delete_message(chat_id=chatId, message_id= chosenMessageId2[0])
+        if chosenMessageId1 != 0:
+            bot.delete_message(chat_id=chatId, message_id= chosenMessageId1[0])
+            dbTable.storeChosenChallenger(0)
+        if chosenMessageId2 != 0: 
+            bot.delete_message(chat_id=chatId, message_id= chosenMessageId2[0])
+            dbTable.storeChosenChallenged(0)
 
         bot.edit_message_text(chat_id=chatId, message_id=messageId, text = 'The numbers are chosen! Lets come to the final and compare them in:')
         time.sleep(2.5)
@@ -202,10 +202,10 @@ def chooseNumber(query):
 def deleteFinalMessages(query):
     chatId = query.message.chat.id
     messageId = query.message.message_id
-    bot.delete_message(chat_id=chatId, message_id=messageId)
+    #bot.delete_message(chat_id=chatId, message_id=messageId)
                
 while True:
     try:
-        bot.polling(interval=1)
+        bot.polling()
     except Exception:
         time.sleep(15)
